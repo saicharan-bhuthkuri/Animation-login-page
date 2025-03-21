@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <div class="max-w-lg mx-auto mt-10 bg-white shadow p-4 rounded">
+        <h2 class="text-xl font-bold mb-4 text-center">Chat with Arogyasri Bot</h2>
+        <div id="chatbox" class="h-64 overflow-y-auto border p-3 rounded mb-4"></div>
+        <input type="text" id="userInput" placeholder="Type your message..." 
+               class="w-full p-2 border rounded mb-2">
+        <button onclick="sendMessage()" class="w-full bg-blue-600 text-white py-2 rounded">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById("userInput").value;
+            if (!userInput) return;
+
+            displayMessage("You: " + userInput, "user");
+
+            const requestBody = {
+                "botAliasId": "TSTALIASID",
+                "botId": "EPGKYET76Y",
+                "localeId": "en_US",
+                "text": userInput,
+                "sessionId": "537124978954832"
+            };
+
+            try {
+                const response = await fetch("YOUR_API_ENDPOINT_HERE", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                const botReply = data.messages[0]?.content || "Sorry, I didn't understand that.";
+
+                displayMessage("Bot: " + botReply, "bot");
+            } catch (error) {
+                console.error("Error fetching response:", error);
+                displayMessage("Bot: There was an error processing your request.", "bot");
+            }
+
+            document.getElementById("userInput").value = "";
+        }
+
+        function displayMessage(message, sender) {
+            const chatbox = document.getElementById("chatbox");
+            const messageElement = document.createElement("p");
+            messageElement.textContent = message;
+            messageElement.className = sender === "user" ? "text-right text-blue-600 font-semibold" : "text-left text-gray-700";
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
